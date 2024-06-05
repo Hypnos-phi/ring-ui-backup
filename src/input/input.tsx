@@ -26,7 +26,8 @@ import {ControlLabel, LabelType} from '../control-label/control-label';
 import styles from './input.css';
 
 
-function noop() {}
+function noop() {
+}
 
 /**
  * @name Input
@@ -51,6 +52,10 @@ export interface InputBaseProps {
   inputClassName?: string | null | undefined
   label?: ReactNode
   labelType?: LabelType
+  renderInput?: ((
+    multiline: boolean,
+    props: InputHTMLAttributes<HTMLInputElement>
+  ) => ReactNode) | null | undefined
   active?: boolean | null | undefined
   error?: ReactNode | null | undefined
   borderless?: boolean | null | undefined
@@ -107,6 +112,7 @@ export class Input extends PureComponent<InputProps> {
   frame?: number;
   input?: HTMLInputElement | HTMLTextAreaElement | null;
   id = getUID('ring-input-');
+
   getId() {
     return this.props.id || this.id;
   }
@@ -156,12 +162,12 @@ export class Input extends PureComponent<InputProps> {
     }
   };
 
-  render() {
+  renderInput() {
     const {
       // Modifiers
       size,
       active,
-      multiline,
+      multiline = false,
       borderless,
 
       // Props
@@ -180,9 +186,70 @@ export class Input extends PureComponent<InputProps> {
       placeholder,
       icon,
       translations,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       height = this.context,
       afterInput,
       ...restProps
+    } = this.props;
+    const inputClasses = classNames(styles.input, inputClassName);
+    const text = value != null ? value : children;
+
+    const commonProps = {
+      ref: composeRefs(this.inputRef, inputRef),
+      className: inputClasses,
+      value: text,
+      disabled,
+      id: this.getId(),
+      placeholder,
+      'aria-label': typeof label === 'string' && label ? label : placeholder,
+      'data-enabled-shortcuts': Array.isArray(enableShortcuts) ? enableShortcuts.join(',') : null
+    };
+
+    if (this.props.renderInput) {
+      return this.props.renderInput(multiline, {
+        onChange: this.handleInputChange,
+        ...commonProps,
+        ...(restProps as TextareaHTMLAttributes<HTMLInputElement>)
+      } satisfies InputHTMLAttributes<HTMLInputElement>);
+    }
+
+    return multiline
+      ? (
+        <textarea
+          onChange={this.handleTextareaChange}
+          rows={1}
+          {...commonProps}
+          {...restProps as TextareaHTMLAttributes<HTMLTextAreaElement>}
+        />
+      )
+      : (
+        <input
+          onChange={this.handleInputChange}
+          {...commonProps}
+          {...restProps as InputHTMLAttributes<HTMLInputElement>}
+        />
+      );
+  }
+
+  render() {
+    const {
+      // Modifiers
+      size,
+      active,
+      borderless,
+
+      // Props
+      label,
+      labelType,
+      error,
+      className,
+      onClear,
+      disabled,
+      enableShortcuts,
+      icon,
+      translations,
+      height = this.context,
+      afterInput
     } = this.props;
 
     const {empty} = this.state;
@@ -204,20 +271,6 @@ export class Input extends PureComponent<InputProps> {
       }
     );
 
-    const inputClasses = classNames(styles.input, inputClassName);
-
-    const text = value != null ? value : children;
-
-    const commonProps = {
-      ref: composeRefs(this.inputRef, inputRef),
-      className: inputClasses,
-      value: text,
-      disabled,
-      id: this.getId(),
-      placeholder,
-      'aria-label': typeof label === 'string' && label ? label : placeholder,
-      'data-enabled-shortcuts': Array.isArray(enableShortcuts) ? enableShortcuts.join(',') : null
-    };
 
     return (
       <I18nContext.Consumer>
@@ -232,22 +285,7 @@ export class Input extends PureComponent<InputProps> {
             )}
             <div className={styles.container}>
               {icon && <Icon glyph={icon} className={styles.icon}/>}
-              {multiline
-                ? (
-                  <textarea
-                    onChange={this.handleTextareaChange}
-                    rows={1}
-                    {...commonProps}
-                    {...restProps as TextareaHTMLAttributes<HTMLTextAreaElement>}
-                  />
-                )
-                : (
-                  <input
-                    onChange={this.handleInputChange}
-                    {...commonProps}
-                    {...restProps as InputHTMLAttributes<HTMLInputElement>}
-                  />
-                )}
+              {this.renderInput()}
               {clearable && !disabled && (
                 <Button
                   title={translations?.clear ?? translate('clear')}

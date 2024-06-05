@@ -45,6 +45,25 @@ export const Basic = () => {
       <Input label="Input with icon" icon={searchIcon} defaultValue="Default value"/>
       <Input name="login" label="Primary label" labelType={LabelType.FORM} placeholder="Hint"/>
       <Input
+        name="custom"
+        label="Custom input"
+        renderInput={(multiline, props) => (
+          multiline
+            ? null
+            : (
+              <div
+                contentEditable
+                style={{background: 'var(--ring-added-background-color)'}}
+                className={props.className ?? ''}
+                onInput={e => {
+                  // eslint-disable-next-line no-console
+                  console.log('Custom input:', e.currentTarget.textContent);
+                }}
+              >{props.value}</div>
+            )
+        )}
+      />
+      <Input
         placeholder="Hint"
         value={borderlessInputValue}
         onChange={e => setBorderlessInputValue(e.currentTarget.value)}
