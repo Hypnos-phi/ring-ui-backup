@@ -426,7 +426,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((...refs) => value => refs.forEach(ref => {\n  if (typeof ref === 'function') {\n    ref(value);\n  } else if (ref != null) {\n    ref.current = value;\n  }\n}));\n\n//# sourceURL=webpack://@jetbrains/ring-ui/./src/global/composeRefs.ts?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   createComposedRef: () => (/* binding */ createComposedRef),\n/* harmony export */   \"default\": () => (/* binding */ composeRefs)\n/* harmony export */ });\n/* harmony import */ var memoize_one__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! memoize-one */ \"./node_modules/memoize-one/dist/memoize-one.esm.js\");\n\n\n\nfunction composeRefs(...refs) {\n  return value => refs.forEach(ref => {\n    if (typeof ref === 'function') {\n      ref(value);\n    } else if (ref != null) {\n      ref.current = value;\n    }\n  });\n}\nfunction createComposedRef() {\n  return (0,memoize_one__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(composeRefs);\n}\n\n//# sourceURL=webpack://@jetbrains/ring-ui/./src/global/composeRefs.ts?");
 
 /***/ }),
 
